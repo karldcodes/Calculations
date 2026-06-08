@@ -5,7 +5,6 @@ services:
       context: .
       dockerfile: CalculationsApi/Dockerfile
     environment:
-      ASPNETCORE_HTTP_PORTS: 8080
       OTEL_SERVICE_NAME: "calculations-api"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://lgtm:4317"
       OTEL_METRIC_EXPORT_INTERVAL: 500 # speeds up data collection for tech test
