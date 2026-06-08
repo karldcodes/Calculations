@@ -18,7 +18,7 @@ namespace CalculationsApi.Tests
         {
             // Arrange
             var response = await _client.PostAsJsonAsync(
-                "/calculation/either",
+                "/calculations/either",
                 new
                 {
                     probabilityA = 0.5m,
@@ -40,7 +40,7 @@ namespace CalculationsApi.Tests
         public async Task PostCalculation_ReturnsNotFound_ForUnknownCalculation()
         {
             var response = await _client.PostAsJsonAsync(
-                "/calculation/unknown",
+                "/calculations/unknown",
                 new { value = 123 });
 
 
@@ -52,7 +52,7 @@ namespace CalculationsApi.Tests
         public async Task PostCalculation_ReturnsBadRequest_ForValidationError()
         {
             var response = await _client.PostAsJsonAsync(
-                "/calculation/either",
+                "/calculations/either",
                 new
                 {
                     probabilityA = 1.5m,
@@ -67,7 +67,7 @@ namespace CalculationsApi.Tests
         public async Task PostCalculation_ReturnsBadRequest_ForWrongRequestBody()
         {
             var response = await _client.PostAsJsonAsync(
-                "/calculation/either",
+                "/calculations/either",
                 new
                 {
                     probabilityAAAAA = 1.0m,

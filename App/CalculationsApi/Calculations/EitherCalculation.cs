@@ -1,14 +1,8 @@
-using FluentValidation;
+using System.ComponentModel.DataAnnotations;
 
 // These calculations assume that they are independent events as specified by the provided formulae.
 public class EitherCalculation : Calculation<CalculationRequest, CalculationResponse>
 {
-    private readonly IValidator<CalculationRequest> validator;
-
-    public EitherCalculation(IValidator<CalculationRequest> validator)
-    {
-        this.validator = validator;
-    }
     public override string Name => "Either";
 
     protected override Task<CalculationResponse> CalculateAsync(CalculationRequest request)
@@ -23,17 +17,18 @@ public class EitherCalculation : Calculation<CalculationRequest, CalculationResp
 
     protected override void Validate(CalculationRequest request)
     {
-        var validationResult = validator.Validate(request);
+        var context = new ValidationContext(request);
+        var results = new List<ValidationResult>();
 
-        if (!validationResult.IsValid)
+        Validator.TryValidateObject(
+            request,
+            context,
+            results,
+            validateAllProperties: true);
+
+        if (results.Any())
         {
-            var errors = new Dictionary<string, string[]>();
-            foreach (var error in validationResult.Errors)
-            {
-                errors.Add(error.PropertyName, [error.ErrorMessage]);
-            }
-
-            throw new CalculationValidationException(errors);
+            throw new CalculationValidationException(new Dictionary<string, string[]>());
         }
     }
 }

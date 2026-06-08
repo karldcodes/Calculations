@@ -1,5 +1,4 @@
 using CalculationsApi.Logger;
-using FluentValidation;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -42,12 +41,22 @@ builder.Logging.AddOpenTelemetry(logging =>
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-builder.Services.AddScoped<IValidator<CalculationRequest>, CalculationRequestValidator>();
-builder.Services.AddScoped<ICalculationFactory,  CalculationFactory>();
+builder.Services.AddSingleton<ICalculationFactory,  CalculationFactory>();
 
 // todo swap this for run time agreegation so we dont need to manually register these
-builder.Services.AddScoped<ICalculation, CombinedWithCalculation>();
-builder.Services.AddScoped<ICalculation, EitherCalculation>();
+builder.Services.AddSingleton<ICalculation, CombinedWithCalculation>();
+builder.Services.AddSingleton<ICalculation, EitherCalculation>();
+
+// Create meta data from all the calculations we have in the assembly. This is done once at start up and then calls from FE to
+// get this list on rerenders should be fast. This assumes calcs are classes and not dynamically added!
+builder.Services.AddSingleton<IReadOnlyList<CalculationMetadata>>(serviceProvider =>
+{
+    var calculations = serviceProvider.GetRequiredService<IEnumerable<ICalculation>>();
+
+    return calculations
+        .Select(CalculationMetadataFactory.Create)
+        .ToList();
+});
 
 var app = builder.Build();
 
@@ -58,10 +67,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-// todo metric around request duration and status codes etc
+
+// return all the data needed for the FE project to display the correct infomation about the calculations
+app.MapGet("/calculations", async (IReadOnlyList<CalculationMetadata> metadata) => Results.Ok(metadata));
+
 
 // A cache could be added here if we know all calculations are deterministic and start becoming expensive to run
-app.MapPost("/calculation/{name}", async (
+app.MapPost("/calculations/{name}", async (
     string name,
     JsonObject request,
     ICalculationFactory calculationFactory,
