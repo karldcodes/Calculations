@@ -19,7 +19,8 @@ public static class CalculationMetadataFactory
             .GetProperties()
             .Select(property => new FieldMetadata(
                 property.Name,
-                MapType(property.PropertyType)
+                MapType(property.PropertyType),
+                IsRequired(property)
             ))
             .ToList();
     }
@@ -39,5 +40,10 @@ public static class CalculationMetadataFactory
         if (type.IsEnum) return "enum";
 
         return "object";
+    }
+
+    private static bool IsRequired(PropertyInfo property)
+    {
+        return property.GetCustomAttribute<RequiredAttribute>() is not null;
     }
 }

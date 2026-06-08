@@ -1,4 +1,5 @@
 public sealed record FieldMetadata(
     string Name,
-    string Type
+    string Type,
+    bool Required
 );

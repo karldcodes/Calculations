@@ -35,17 +35,20 @@ Returns
         "requestFields":[
             {
                 "name":"ProbabilityA",
-                "type":"number"
+                "type":"number",
+                "required":	true
             },
             {
                 "name":"ProbabilityB",
-                "type":"number"
+                "type":"number",
+                "required":	true
             }
         ],
         "responseFields":[
             {
                 "name":"Value",
-                "type":"number"
+                "type":"number",
+                "required":	false
             }
         ]
     },
@@ -54,17 +57,20 @@ Returns
         "requestFields":[
             {
                 "name":"ProbabilityA",
-                "type":"number"
+                "type":"number",
+                "required":	true
             },
             {
                 "name":"ProbabilityB",
-                "type":"number"
+                "type":"number",
+                "required":	true
             }
         ],
         "responseFields":[
             {
                 "name":"Value",
-                "type":"number"
+                "type":"number",
+                "required":	false
             }
         ]
     }
