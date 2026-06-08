@@ -44,8 +44,7 @@ app.UseHttpsRedirection();
 app.MapPost("/calculation/{name}", async (
     string name,
     JsonElement request,
-    ICalculationFactory calculationFactory,
-    IValidator<CalculationRequest> validator
+    ICalculationFactory calculationFactory
     ) =>
 {
     // implement stratergy pattern combined with a factory for using calculations

@@ -1,5 +1,6 @@
 using FluentValidation;
 
+// These calculations assume that they are independent events as specified by the provided formulae.
 public class EitherCalculation : Calculation<CalculationRequest, CalculationResponse>
 {
     private readonly IValidator<CalculationRequest> validator;
@@ -13,7 +14,7 @@ public class EitherCalculation : Calculation<CalculationRequest, CalculationResp
     protected override Task<CalculationResponse> CalculateAsync(CalculationRequest request)
     {
         // P(A) + P(B) – P(A)P(B)
-        var result = request.ProbabilityA + request.ProbabilityB - request.ProbabilityA * request.ProbabilityB;
+        var result = request.ProbabilityA + request.ProbabilityB - (request.ProbabilityA * request.ProbabilityB);
         return Task.FromResult(new CalculationResponse
         {
             Value = result

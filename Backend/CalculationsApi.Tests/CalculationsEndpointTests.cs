@@ -21,8 +21,8 @@ namespace CalculationsApi.Tests
                 "/calculation/either",
                 new
                 {
-                    probabilityA = 0.5f,
-                    probabilityB = 0.5f
+                    probabilityA = 0.5m,
+                    probabilityB = 0.5m
                 });
 
             
@@ -33,7 +33,7 @@ namespace CalculationsApi.Tests
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.Equal(0.75f, result!.Value);
+            Assert.Equal(0.75m, result!.Value);
         }
 
         [Fact]
@@ -55,10 +55,9 @@ namespace CalculationsApi.Tests
                 "/calculation/either",
                 new
                 {
-                    probabilityA = 1.5f,
-                    probabilityB = 0.5f
+                    probabilityA = 1.5m,
+                    probabilityB = 0.5m
                 });
-
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
