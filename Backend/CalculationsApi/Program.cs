@@ -1,21 +1,41 @@
+using CalculationsApi.Logger;
 using FluentValidation;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 var builder = WebApplication.CreateBuilder(args);
 
-const string frontentOrigin = "frontendOrigin";
 
-// setup cors policy so that only the frontend domain can access the backend services
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(frontentOrigin,
-    policy =>
+// Add basic opentelemetry implementation with console logging for local development
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource.AddService(Environment.GetEnvironmentVariable("serviceName") ?? "CalculationsApi"))
+    .WithMetrics(metrics =>
     {
-        policy.WithOrigins("http://localhost:5173")
-                            .AllowAnyHeader()
-                            .AllowAnyMethod()
-                            .AllowCredentials();
+        metrics
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            //.AddConsoleExporter() Dont show metrics in console as it masks logs
+            .AddOtlpExporter();
+    })
+    .WithTracing(tracing =>
+    {
+        tracing
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddConsoleExporter()
+            .AddOtlpExporter();
     });
+
+builder.Logging.AddOpenTelemetry(logging =>
+{
+    logging.IncludeFormattedMessage = true;
+    logging.IncludeScopes = true;
+    logging.AddConsoleExporter();
+    logging.AddOtlpExporter();
 });
 
 
@@ -43,24 +63,35 @@ app.UseHttpsRedirection();
 // A cache could be added here if we know all calculations are deterministic and start becoming expensive to run
 app.MapPost("/calculation/{name}", async (
     string name,
-    JsonElement request,
-    ICalculationFactory calculationFactory
+    JsonObject request,
+    ICalculationFactory calculationFactory,
+    ILogger<Program> logger
     ) =>
 {
+    CalculationsLog.RequestStarted(logger, name, request.ToString());
+
     // implement stratergy pattern combined with a factory for using calculations
     var calculation = calculationFactory.Get(name);
 
     if (calculation is null)
+    {
+        CalculationsLog.NotFound(logger, name);
         return Results.NotFound($"Unknown calculation: {name}");
+    }
 
     // Generic cast from strongly typed abstract class
     object? typedRequest;
     try
     {
-        typedRequest = request.Deserialize(calculation.RequestType);
+        typedRequest = request.Deserialize(calculation.RequestType, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+            UnmappedMemberHandling = System.Text.Json.Serialization.JsonUnmappedMemberHandling.Disallow
+        });
     }
     catch (JsonException)
     {
+        CalculationsLog.InvalidRequest(logger, name);
         // fails if json body doesnt match what the requested calculation expected
         return Results.BadRequest("Invalid request JSON.");
     }
@@ -69,15 +100,16 @@ app.MapPost("/calculation/{name}", async (
     {
         // execute calculation
         var result = await calculation.ExecuteAsync(typedRequest!);
+        CalculationsLog.RequestComplete(logger, name, JsonSerializer.Serialize(result));
         return Results.Ok(result);
     }
     catch (CalculationValidationException ex)
     {
+        CalculationsLog.FailedValidation(logger, name, ex.Message, JsonSerializer.Serialize(ex.Errors));
         return Results.ValidationProblem(ex.Errors);
     }
 });
 
-app.UseCors(frontentOrigin);
 
 app.Run();
 

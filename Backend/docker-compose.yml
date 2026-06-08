@@ -1,0 +1,24 @@
+services:
+  calculationsapi:
+    image: ${DOCKER_REGISTRY-}calculationsapi
+    build:
+      context: .
+      dockerfile: CalculationsApi/Dockerfile
+    environment:
+      ASPNETCORE_HTTP_PORTS: 8080
+      OTEL_SERVICE_NAME: "calculations-api"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://lgtm:4317"
+      OTEL_METRIC_EXPORT_INTERVAL: 500 # speeds up data collection for tech test
+    ports: 
+      - "8080:8080"
+      - "8081:8081" 
+    depends_on:
+      - lgtm
+
+  lgtm:
+    image: grafana/otel-lgtm:latest
+    container_name: lgtm
+    ports:
+      - "3000:3000"   # Grafana UI
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP

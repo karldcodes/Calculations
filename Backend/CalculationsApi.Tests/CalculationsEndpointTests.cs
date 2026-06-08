@@ -62,5 +62,20 @@ namespace CalculationsApi.Tests
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
+
+        [Fact]
+        public async Task PostCalculation_ReturnsBadRequest_ForWrongRequestBody()
+        {
+            var response = await _client.PostAsJsonAsync(
+                "/calculation/either",
+                new
+                {
+                    probabilityAAAAA = 1.0m,
+                    probabilityB = 0.5m
+                });
+
+            // Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
     }
 }
