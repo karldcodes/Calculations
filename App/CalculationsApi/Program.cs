@@ -17,7 +17,7 @@ builder.Services.AddOpenTelemetry()
         metrics
             .AddAspNetCoreInstrumentation()
             .AddHttpClientInstrumentation()
-            //.AddConsoleExporter() Dont show metrics in console as it masks logs
+            .AddConsoleExporter()
             .AddOtlpExporter();
     })
     .WithTracing(tracing =>
@@ -41,14 +41,15 @@ builder.Logging.AddOpenTelemetry(logging =>
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-builder.Services.AddSingleton<ICalculationFactory,  CalculationFactory>();
+// added as singleton so each request doesnt keep repeatable getting all calculations from DI
+builder.Services.AddSingleton<ICalculationFactory,  CalculationFactory>(); 
 
-// todo swap this for run time agreegation so we dont need to manually register these
+// For this tech demo the calcs are manually registered but in a real app they could be dynamically added on startup
 builder.Services.AddSingleton<ICalculation, CombinedWithCalculation>();
 builder.Services.AddSingleton<ICalculation, EitherCalculation>();
 
-// Create meta data from all the calculations we have in the assembly. This is done once at start up and then calls from FE to
-// get this list on rerenders should be fast. This assumes calcs are classes and not dynamically added!
+// Create meta data from all the calculations we have in the assembly. This is done once at start up so calls from FE to
+// get this list on any rerenders should be fast. This assumes calcs are classes and not dynamically added!
 builder.Services.AddSingleton<IReadOnlyList<CalculationMetadata>>(serviceProvider =>
 {
     var calculations = serviceProvider.GetRequiredService<IEnumerable<ICalculation>>();
@@ -68,7 +69,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// return all the data needed for the FE project to display the correct infomation about the calculations
+// return all the meta data needed for the FE project to dynamically render the calculation form
 app.MapGet("/calculations", async (IReadOnlyList<CalculationMetadata> metadata) => Results.Ok(metadata));
 
 

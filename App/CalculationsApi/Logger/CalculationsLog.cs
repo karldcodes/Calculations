@@ -1,5 +1,6 @@
 ﻿namespace CalculationsApi.Logger
 {
+    // Keep event ids in the 1000 range for easy identification
     public static partial class CalculationsLog
     {
         [LoggerMessage(
