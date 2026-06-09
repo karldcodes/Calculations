@@ -1,6 +1,10 @@
 <Solution>
   <Project Path="CalculationsApi.Tests/CalculationsApi.Tests.csproj" Id="1613f33b-5c02-4ebe-aec0-f16774a2c1d5" />
   <Project Path="CalculationsApi/CalculationsApi.csproj" />
+  <Project Path="CalculationsFrontend/calculationsfrontend.esproj" DisplayName="Calculationsfrontend">
+    <Build />
+    <Deploy />
+  </Project>
   <Project Path="docker-compose.dcproj">
     <Build />
   </Project>
