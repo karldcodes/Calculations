@@ -46,7 +46,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(FrontendPolicy, policy =>
     {
         policy
-            .WithOrigins("http://localhost:53434") // React example
+            .WithOrigins("http://localhost:53434") // React FE in the real app this would come from appsettings etc
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
