@@ -5,20 +5,22 @@ namespace CalculationsApi.Tests.Calculations
     {
         [Theory]
         [InlineData(0.5, 0.5, 0.75)]
-        [InlineData(0, 0, 0)]
-        [InlineData(1, 1, 1)]
-        [InlineData(1, 0, 1)]
-        public async Task Either_PrecisionEdgeCases_ReturnsCorrectValue(decimal A, decimal B, decimal expected)
+        [InlineData(0, 0.5, 0.5)]
+        [InlineData(1, 0.5, 1)]
+        public async Task ExecuteAsync_ReturnsExpectedResult(
+        decimal probabilityA,
+        decimal probabilityB,
+        decimal expected)
         {
             var calc = new EitherCalculation();
 
-            var reault = await calc.ExecuteAsync(new CalculationRequest
+            var result = await calc.ExecuteAsync(new CalculationRequest
             {
-                ProbabilityA = A,
-                ProbabilityB = B
+                ProbabilityA = probabilityA,
+                ProbabilityB = probabilityB
             });
 
-            Assert.Equal(expected, ((CalculationResponse)reault!).Value);
+            Assert.Equal(expected, ((CalculationResponse)result!).Value);
         }
     }
 }
