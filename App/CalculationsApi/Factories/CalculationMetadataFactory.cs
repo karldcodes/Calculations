@@ -9,7 +9,7 @@ public static class CalculationMetadataFactory
             Guid.NewGuid(), // used for react FE to have a key for loops
             calculation.Name,
             GetFields(calculation.RequestType),
-            GetFields(calculation.ResponseType)
+            GetFields(calculation.ResponseType) // Not used in FE at the moment but there is a comment in the form submission logic to explain its use
         );
     }
 

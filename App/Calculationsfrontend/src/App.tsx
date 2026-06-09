@@ -52,6 +52,8 @@ function App() {
                 return;
             }
 
+            // here we could use the mappings provided by selectedCalc.responseFields to map out how we display the data
+            // as its a demo we know that the object has a value prop so we'll just use that here
             const result = await response.json();
             setCalculationResult(result.value);
 
