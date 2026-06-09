@@ -26,6 +26,12 @@ Docker Compose was included to demonstrate how the application could be containe
 
 The frontend was intentionally excluded from the Docker Compose setup to keep the demonstration focused and lightweight.
 
+### Patterns used
+
+- Stratergy to allow one abstraction to represent any calculation
+- Template to define that when running a calculation it must validate it first before running the logic
+- Factory to get the correct calculation from the list of registered calculations
+
 ## Adding a New Calculation
 
 To add a new calculation to the backend:

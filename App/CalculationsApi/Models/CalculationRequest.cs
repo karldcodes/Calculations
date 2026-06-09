@@ -1,7 +1,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-// This is being used by both combinedWith and either but this doesnt have to
+// This is being used by both combinedWith and either but this doesnt have to calculations can have their own classes
 public class CalculationRequest {
     [Required]
     [Display(Name = "Probability A")]

@@ -1,17 +1,17 @@
-export interface Calculation {
-    id : string,
-    name: string,
-    requestFields: Field[],
-    responseFields: Field[]
+export type Calculation = {
+    id : string;
+    name: string;
+    requestFields: Field[];
+    responseFields: Field[];
 }
 
-export interface Field {
-    id: string,
-    name: string,
-    label: string,
-    type: string,
-    required: boolean,
-    metadata?: FieldMetadata
+export type Field = {
+    id: string;
+    name: string;
+    label: string;
+    type: string;
+    required: boolean;
+    metadata?: FieldMetadata;
 }
 
 type FieldMetadata = {

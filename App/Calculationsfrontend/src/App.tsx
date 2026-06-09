@@ -1,24 +1,13 @@
-import { useState } from 'react'
-import useSWR from 'swr'
-import { get } from "./clients/get"
-import type { Calculation } from './types/calculation';
+import { useState } from 'react';
 import { parseFormData } from './parser/formData';
-
-// wrapper to abstract and seperate api call logic
-function useCalculations() {
-    const { data, error, isLoading } = useSWR<Calculation[]>("/calculations", get);
-
-    return {
-        calculations: data ?? [],
-        isLoading,
-        error
-    };
-}
-
+import { useCalculations } from './datahooks/useCalculations';
+import type { ValidationErrors } from './types/ValidationErrors';
+import { FormField } from './components/formField';
+import { FormError } from './components/formError';
 
 function App() {
     const { calculations, isLoading, error } = useCalculations();
-    const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({});
+    const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
     const [selected, setSelected] = useState("");
     const [calculationResult, setCalculationResult] = useState<number | null>(null);
 
@@ -105,11 +94,11 @@ function App() {
                         <label htmlFor="calculation" className="block text-sm font-medium text-slate-700 mb-1">
                             Calculation Type
                         </label>
+                        
                         {(validationErrors["_generic"] ?? []).map(error => (
-                            <p key={error} className="text-red-500 py-2">
-                                {error}
-                            </p>
+                            <FormError key={error} error={error} />
                         ))}
+
                         <select
                             id="calculation"
                             name="selectedFunction"
@@ -128,20 +117,7 @@ function App() {
                     </div>
 
                     {selectedCalc?.requestFields.map(field =>
-                        <div id={field.id} key={field.id}>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">{field.label}</label>
-                            {(validationErrors[field.name] ?? []).map(error => (
-                                <p key={error} className="text-red-500 py-2">
-                                    {error}
-                                </p>
-                            ))}
-                            <input
-                                type={field.type}
-                                name={field.name}
-                                {...field.metadata}
-                                className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
-                            />
-                        </div>
+                        <FormField key={field.id} field={field} validationErrors={validationErrors} />
                     )}
 
                     <button
