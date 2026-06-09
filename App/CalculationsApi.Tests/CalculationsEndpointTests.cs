@@ -48,31 +48,23 @@ namespace CalculationsApi.Tests
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
-        [Fact]
-        public async Task PostCalculation_ReturnsBadRequest_ForValidationError()
+        [InlineData("1.5")]
+        [InlineData("1.1")]
+        [InlineData("1.2")]
+        [InlineData("1.3")]
+        [Theory]
+        public async Task PostCalculation_ReturnsBadRequest_ForValidationError(string value)
         {
             var response = await _client.PostAsJsonAsync(
                 "/calculations/either",
                 new
                 {
-                    probabilityA = "1.5",
+                    probabilityA = value,
                     probabilityB = "0.5"
                 });
 
-            // Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        }
-
-        [Fact]
-        public async Task PostCalculation_ReturnsBadRequest_ForValidationError2()
-        {
-            var response = await _client.PostAsJsonAsync(
-                "/calculations/combinedWith",
-                new
-                {
-                    probabilityA = "1.5",
-                    probabilityB = "0.5"
-                });
+            // Act
+            var result = await response.Content.ReadAsStringAsync();
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);

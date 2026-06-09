@@ -1,6 +1,9 @@
-public sealed record FieldMetadata(
-    Guid Id,
-    string Name,
-    string Type,
-    bool Required
-);
+public sealed class FieldMetadata
+{
+    public string Id { get; set; } = "";
+    public string Name { get; set; } = "";
+    public string Label { get; set; } = "";
+    public string Type { get; set; } = "text";
+
+    public Dictionary<string, object> Metadata { get; set; } = [];
+}

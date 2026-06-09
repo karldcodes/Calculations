@@ -1,3 +1,4 @@
+using CalculationsApi.Validation;
 using System.ComponentModel.DataAnnotations;
 
 // These calculations assume that they are independent events as specified by the provided formulae.
@@ -17,18 +18,12 @@ public class EitherCalculation : Calculation<CalculationRequest, CalculationResp
 
     protected override void Validate(CalculationRequest request)
     {
-        var context = new ValidationContext(request);
-        var results = new List<ValidationResult>();
+        var validator = new DataAttributeValidator();
+        var result = validator.Validate(request);
 
-        Validator.TryValidateObject(
-            request,
-            context,
-            results,
-            validateAllProperties: true);
-
-        if (results.Any())
+        if (result.Any())
         {
-            throw new CalculationValidationException(new Dictionary<string, string[]>());
+            throw new CalculationValidationException(result);
         }
     }
 }

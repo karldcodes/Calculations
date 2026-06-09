@@ -122,9 +122,14 @@ app.MapPost("/calculations/{name}", async (
     }
     catch (JsonException ex)
     {
-        CalculationsLog.InvalidRequest(logger, name);
-        // fails if json body doesnt match what the requested calculation expected
-        return Results.BadRequest("Invalid request JSON.");
+        CalculationsLog.InvalidRequest(logger, ex, name);
+        // fails if json body doesnt match what the requested calculation expected.
+        // send alert to SD team to take a look at the models coming from the client
+        return Results.ValidationProblem(
+        errors: new Dictionary<string, string[]>
+        {
+            { "_generic", new[] { "Invalid request JSON." } }
+        });
     }
 
     try
@@ -136,7 +141,7 @@ app.MapPost("/calculations/{name}", async (
     }
     catch (CalculationValidationException ex)
     {
-        CalculationsLog.FailedValidation(logger, name, ex.Message, JsonSerializer.Serialize(ex.Errors));
+        CalculationsLog.FailedValidation(logger, ex, name, ex.Message, JsonSerializer.Serialize(ex.Errors));
         return Results.ValidationProblem(ex.Errors);
     }
 });

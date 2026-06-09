@@ -29,6 +29,7 @@
         Message = "The request provided invalid json for calculation type: {calculationType}")]
         internal static partial void InvalidRequest(
         ILogger logger,
+        Exception error,
         string calculationType);
 
         [LoggerMessage(
@@ -48,6 +49,7 @@
         Message = "The request failed validation calculation type: {calculationType}, message: {message} errors: {errors}")]
         internal static partial void FailedValidation(
         ILogger logger,
+        Exception ex,
         string calculationType,
         string message,
         string errors);

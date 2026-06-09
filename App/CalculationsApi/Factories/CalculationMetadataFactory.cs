@@ -13,22 +13,51 @@ public static class CalculationMetadataFactory
         );
     }
 
-    // use reflection to find out the meta data on the calcuation request and response types
+    // use reflection to find out the meta data on the calcuation request and response types this will be used in FE to dynamically create the form fields
     private static IReadOnlyList<FieldMetadata> GetFields(Type type)
     {
         return type
             .GetProperties()
-            .Select(property => new FieldMetadata(
-                Guid.NewGuid(), // used for react FE to have a key for loops
-                property.Name,
-                MapType(property.PropertyType),
-                IsRequired(property)
-            ))
+            .Select(prop =>
+            {
+                var metadata = new Dictionary<string, object>();
+
+                if(IsRequired(prop))
+                    metadata["required"] = true;
+
+                if (prop.PropertyType == typeof(decimal) ||
+                prop.PropertyType == typeof(double) ||
+                prop.PropertyType == typeof(float) ||
+                prop.PropertyType == typeof(int))
+                {
+                    metadata["step"] = "any";
+                }
+
+                if (prop.GetCustomAttribute<RangeAttribute>() is { } range)
+                {
+                    metadata["min"] = range.Minimum?.ToString() ?? "";
+                    metadata["max"] = range.Maximum?.ToString() ?? "";
+                }
+
+                // Get field label
+                var display = prop.GetCustomAttribute<DisplayAttribute>();
+                var label = display?.GetName() ?? prop.Name;
+
+                return new FieldMetadata
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = prop.Name,
+                    Label = label,
+                    Type = GetInputType(prop.PropertyType),
+                    Metadata = metadata
+                };
+
+            })
             .ToList();
     }
 
     // dont leak .net types to frontend. Keep them only related to JS types
-    private static string MapType(Type type)
+    private static string GetInputType(Type type)
     {
         type = Nullable.GetUnderlyingType(type) ?? type;
 
