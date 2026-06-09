@@ -1,6 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
 
 public class CombinedWithCalculation : Calculation<CalculationRequest, CalculationResponse>
 {

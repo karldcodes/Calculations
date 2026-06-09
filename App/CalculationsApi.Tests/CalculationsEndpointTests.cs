@@ -21,8 +21,8 @@ namespace CalculationsApi.Tests
                 "/calculations/either",
                 new
                 {
-                    probabilityA = 0.5m,
-                    probabilityB = 0.5m
+                    probabilityA = "0.5",
+                    probabilityB = "0.5"
                 });
 
             
@@ -55,8 +55,23 @@ namespace CalculationsApi.Tests
                 "/calculations/either",
                 new
                 {
-                    probabilityA = 1.5m,
-                    probabilityB = 0.5m
+                    probabilityA = "1.5",
+                    probabilityB = "0.5"
+                });
+
+            // Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task PostCalculation_ReturnsBadRequest_ForValidationError2()
+        {
+            var response = await _client.PostAsJsonAsync(
+                "/calculations/combinedWith",
+                new
+                {
+                    probabilityA = "1.5",
+                    probabilityB = "0.5"
                 });
 
             // Assert
@@ -70,8 +85,8 @@ namespace CalculationsApi.Tests
                 "/calculations/either",
                 new
                 {
-                    probabilityAAAAA = 1.0m,
-                    probabilityB = 0.5m
+                    probabilityAAAAA = "1.0",
+                    probabilityB = "0.5"
                 });
 
             // Assert

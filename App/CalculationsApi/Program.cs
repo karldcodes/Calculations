@@ -5,9 +5,9 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 // Add basic opentelemetry implementation with console logging for local development
 builder.Services.AddOpenTelemetry()
@@ -35,6 +35,21 @@ builder.Logging.AddOpenTelemetry(logging =>
     logging.IncludeScopes = true;
     logging.AddConsoleExporter();
     logging.AddOtlpExporter();
+});
+
+
+// This adds a cors policy so that only the FE can access the api but in a real app this would be handled by Azure API Management
+const string FrontendPolicy = "FrontendPolicy";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(FrontendPolicy, policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:53434") // React example
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
 });
 
 
@@ -69,6 +84,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors(FrontendPolicy);
+
 // return all the meta data needed for the FE project to dynamically render the calculation form
 app.MapGet("/calculations", async (IReadOnlyList<CalculationMetadata> metadata) => Results.Ok(metadata));
 
@@ -99,10 +116,11 @@ app.MapPost("/calculations/{name}", async (
         typedRequest = request.Deserialize(calculation.RequestType, new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true,
-            UnmappedMemberHandling = System.Text.Json.Serialization.JsonUnmappedMemberHandling.Disallow
+            UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+            NumberHandling = JsonNumberHandling.AllowReadingFromString
         });
     }
-    catch (JsonException)
+    catch (JsonException ex)
     {
         CalculationsLog.InvalidRequest(logger, name);
         // fails if json body doesnt match what the requested calculation expected

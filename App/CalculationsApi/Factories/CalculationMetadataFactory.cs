@@ -6,6 +6,7 @@ public static class CalculationMetadataFactory
     public static CalculationMetadata Create(ICalculation calculation)
     {
         return new CalculationMetadata(
+            Guid.NewGuid(), // used for react FE to have a key for loops
             calculation.Name,
             GetFields(calculation.RequestType),
             GetFields(calculation.ResponseType)
@@ -18,6 +19,7 @@ public static class CalculationMetadataFactory
         return type
             .GetProperties()
             .Select(property => new FieldMetadata(
+                Guid.NewGuid(), // used for react FE to have a key for loops
                 property.Name,
                 MapType(property.PropertyType),
                 IsRequired(property)
