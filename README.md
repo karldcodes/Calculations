@@ -175,6 +175,7 @@ Before running the application, ensure the following are installed:
 
 - Docker Desktop
 - Visual Studio 2026
+- node and npm (only needed if you want to run the frontend unit tests)
 
 **Start**
 
