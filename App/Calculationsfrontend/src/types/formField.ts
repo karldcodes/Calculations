@@ -1,5 +1,5 @@
 import type { Field } from "./calculation";
-import type { ValidationErrors } from "./ValidationErrors";
+import type { ValidationErrors } from "./validationErrors";
 
 
 export type FormField = {

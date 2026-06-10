@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { parseFormData } from './parser/formData';
 import { useCalculations } from './datahooks/useCalculations';
-import type { ValidationErrors } from './types/ValidationErrors';
 import { FormField } from './components/formField';
 import { FormError } from './components/formError';
+import type { ValidationErrors } from './types/validationErrors';
 
 function App() {
     const { calculations, isLoading, error } = useCalculations();
