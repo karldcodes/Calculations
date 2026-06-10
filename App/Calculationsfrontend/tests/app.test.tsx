@@ -85,7 +85,5 @@ describe("App", () => {
 
 
     expect(await screen.findByText("0.75")).toBeInTheDocument();
-
-    // screen.debug(); display html in console
   });
 });
