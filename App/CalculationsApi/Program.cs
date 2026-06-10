@@ -99,7 +99,7 @@ public partial class Program
 
         app.UseCors(FrontendPolicy);
 
-        // Add health check url
+        // Add health check url this would be used by AKS for example to check the app is ok and doesnt need to be restarted etc
         app.MapHealthChecks("/health");
 
         /* 
