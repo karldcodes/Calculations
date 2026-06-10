@@ -154,9 +154,9 @@ It is also worth noting that, in a real-world application, I would typically mai
 
 ### Testing
 
-For the backend I created unit tests with xunit to cover the calculations and used WebApplicationFactory to write integrations tests for the API.
+For the backend, I used xUnit to create unit tests covering the individual calculation implementations, ensuring that the core business logic produces the expected results. I also used WebApplicationFactory to write integration tests against the API, validating scenarios such as successful requests, validation failures, invalid request payloads and unknown calculations. This provides confidence that the API behaves correctly as a whole, including its routing, deserialisation and validation behaviour.
 
-For the frontend I chose to use Vitest as it integrates well with vite and natively supports typescript which I used to create the frontend application.
+For the frontend, I chose to use Vitest, as it integrates well with Vite and provides first-class support for TypeScript, which was used to build the React application. Frontend tests focus on validating component behaviour and user interactions, such as rendering dynamic form fields, displaying validation messages and presenting calculation results correctly.
 
 ### Patterns used
 
