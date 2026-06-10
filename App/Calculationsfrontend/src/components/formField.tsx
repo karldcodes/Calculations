@@ -1,7 +1,7 @@
-import type { FormField } from "../types/formField"
+import type { FormFieldProps } from "../types/formFieldProps"
 import { FormError } from "./formError"
 
-export function FormField({ field, validationErrors }: FormField){
+export function FormField({ field, validationErrors }: FormFieldProps){
     return (
         <div id={field.id}>
             <label className="block text-sm font-medium text-slate-700 mb-1">{field.label}</label>
