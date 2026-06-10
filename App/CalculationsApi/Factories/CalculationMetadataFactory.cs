@@ -26,8 +26,8 @@ public static class CalculationMetadataFactory
                     metadata["required"] = true;
 
                 if (prop.PropertyType == typeof(decimal) ||
-                prop.PropertyType == typeof(double) ||
-                prop.PropertyType == typeof(float)) 
+                    prop.PropertyType == typeof(double) ||
+                    prop.PropertyType == typeof(float)) 
                 {
                     metadata["step"] = "0.1";
                 }
@@ -65,16 +65,29 @@ public static class CalculationMetadataFactory
     {
         type = Nullable.GetUnderlyingType(type) ?? type;
 
-        if (type == typeof(string)) return "string";
-        if (type == typeof(int)) return "number";
-        if (type == typeof(decimal)) return "number";
-        if (type == typeof(double)) return "number";
-        if (type == typeof(float)) return "number";
-        if (type == typeof(bool)) return "boolean";
-        if (type == typeof(DateTime)) return "date";
-        if (type.IsEnum) return "enum";
+        if (type.IsEnum)
+            return "enum";
 
-        return "object";
+        return Type.GetTypeCode(type) switch
+        {
+            TypeCode.String => "string",
+
+            TypeCode.Int16 or // account for any .net number types rather then just int etc
+            TypeCode.Int32 or
+            TypeCode.Int64 or
+            TypeCode.UInt16 or
+            TypeCode.UInt32 or
+            TypeCode.UInt64 or
+            TypeCode.Decimal or
+            TypeCode.Double or
+            TypeCode.Single => "number",
+
+            TypeCode.Boolean => "boolean",
+
+            TypeCode.DateTime => "date",
+
+            _ => "object"
+        };
     }
 
     private static bool IsRequired(PropertyInfo property)
