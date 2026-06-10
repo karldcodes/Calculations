@@ -27,10 +27,14 @@ public static class CalculationMetadataFactory
 
                 if (prop.PropertyType == typeof(decimal) ||
                 prop.PropertyType == typeof(double) ||
-                prop.PropertyType == typeof(float) ||
-                prop.PropertyType == typeof(int))
+                prop.PropertyType == typeof(float)) 
                 {
-                    metadata["step"] = "any";
+                    metadata["step"] = "0.1";
+                }
+
+                if (prop.PropertyType == typeof(int))
+                {
+                    metadata["step"] = "1";
                 }
 
                 if (prop.GetCustomAttribute<RangeAttribute>() is { } range)
