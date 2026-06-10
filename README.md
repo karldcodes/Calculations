@@ -77,7 +77,7 @@ I would use AKS to orchestrate the application as it provides auto scaling, roll
 
 **Application insights**
 
-I would use this platform as it provides a central location for logs, traces and metrics. 
+I would use this platform as it provides a central location for logs, traces and metrics. Its also managed completely by microsoft so that saves any operational overhead and provides native intergration with the other Azure products we are already using.
 
 #### CI/CD Pipeline
 
