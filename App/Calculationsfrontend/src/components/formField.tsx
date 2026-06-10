@@ -3,14 +3,15 @@ import { FormError } from "./formError"
 
 export function FormField({ field, validationErrors }: FormFieldProps){
     return (
-        <div id={field.id}>
-            <label className="block text-sm font-medium text-slate-700 mb-1">{field.label}</label>
+        <div>
+            <label htmlFor={field.id} className="block text-sm font-medium text-slate-700 mb-1">{field.label}</label>
             
             {(validationErrors[field.name] ?? []).map(error => (
                 <FormError error={error} />
             ))}
 
             <input
+                id={field.id}
                 type={field.type}
                 name={field.name}
                 {...field.metadata}
