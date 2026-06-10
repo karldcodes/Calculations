@@ -9,10 +9,10 @@ services:
       OTEL_SERVICE_NAME: "calculations-api"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://lgtm:4317"
       OTEL_METRIC_EXPORT_INTERVAL: 500 # speeds up data collection for tech test
-      FRONTEND_URL: "http://localhost:53434"
+      FRONTEND_URL: "http://localhost:53434" # must be localhost here as its coming from the browser and not container to container communication
+      ASPNETCORE_URLS: "http://+:8080" # set which ports kestral listens on and allows connections outside of the container
     ports: 
       - "8080:8080"
-      - "8081:8081" 
     depends_on:
       - lgtm
 
@@ -21,7 +21,7 @@ services:
     build:
       context: CalculationsFrontend
       args:
-        VITE_API_URL: https://localhost:8081 # overrites value in env file
+        VITE_API_URL: http://localhost:8080 # overrites value in env file
     ports:
       - "53434:80"
     depends_on:
