@@ -48,7 +48,7 @@ public partial class Program
             options.AddPolicy(FrontendPolicy, policy =>
             {
                 policy
-                    .WithOrigins("http://localhost:53434") // React FE in the real app this would come from appsettings etc
+                    .WithOrigins(Environment.GetEnvironmentVariable("FRONTEND_URL") ?? "http://localhost:53434") // React FE
                     .AllowAnyHeader()
                     .AllowAnyMethod();
             });
@@ -58,6 +58,14 @@ public partial class Program
         // Add services to the container.
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
+
+        // Add swagger
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen();
+
+        // Add health check URL for orchistration
+        builder.Services.AddHealthChecks();
+
         // added as singleton so each request doesnt keep repeatable getting all calculations from DI
         builder.Services.AddSingleton<ICalculationFactory, CalculationFactory>();
 
@@ -83,25 +91,36 @@ public partial class Program
         if (app.Environment.IsDevelopment())
         {
             app.MapOpenApi();
+            app.UseSwagger();
+            app.UseSwaggerUI();
         }
 
         app.UseHttpsRedirection();
 
         app.UseCors(FrontendPolicy);
 
+        // Add health check url
+        app.MapHealthChecks("/health");
 
         /* 
          * in a simple project with only a few apis id keep it as a minimal api rather then creating controllers to save extra boilerplate
          */
 
+        app.MapGet("/", async () => Results.Ok("Caclulations API"));
+
         // return all the meta data needed for the FE project to dynamically render the calculation form
-        app.MapGet("/calculations", async (IReadOnlyList<CalculationMetadata> metadata) => Results.Ok(metadata));
+        app.MapGet("/calculations", async (IReadOnlyList<CalculationMetadata> metadata) => Results.Ok(metadata))
+            .WithName("GetCalculations")
+            .WithSummary("Gets available calculations and their request and response bodies");
 
         // A cache could be added here if we know all calculations are deterministic and start becoming expensive to run
         app.MapPost("/calculations/{name}", async (
                     string name,
                     JsonObject request,
-                    ICalculationRequestHandler handler) => await handler.HandleAsync(name, request));
+                    ICalculationRequestHandler handler) => await handler.HandleAsync(name, request))
+        .WithName("ExecuteCalculation")
+        .WithSummary("Executes a calculation by name")
+        .WithDescription("The request body depends on the selected calculation. Use GET /calculations to discover the required fields."); ;
 
         app.Run();
     }
